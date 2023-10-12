@@ -1,0 +1,84 @@
+plugins {
+    id 'java-library'
+}
+
+configurations {
+    schema
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java', 'build/generated-sources']
+        resources.srcDirs = ['src/main/resources']
+    }
+}
+
+dependencies {
+    api project(':common-db')
+
+    implementation project(':common-util')
+    implementation project(':common-verifier')
+
+    // DB layer tests use HSQLDB with in-memory tables
+    testImplementation "org.hsqldb:hsqldb:$hsqldbVersion"
+    testImplementation project(':common-db')
+    testImplementation project(':common-test')
+    testImplementation "org.hibernate:hibernate-hikaricp:$hibernateVersion"
+
+    schema project(':common-util')
+    schema "org.apache.ant:ant:1.10.11"
+    schema "org.hibernate:hibernate-hikaricp:$hibernateVersion"
+    schema "org.hibernate:hibernate-tools:$hibernateVersion"
+    schema 'commons-collections:commons-collections:3.2.2'
+    schema "ch.qos.logback:logback-classic:${logbackVersion}"
+    schema "org.hsqldb:hsqldb:$hsqldbVersion"
+}
+
+task schemaExport () {
+    doLast {
+        ant.taskdef(name: 'schemaExport', classname: 'org.hibernate.tool.ant.HibernateToolTask', classpath: configurations.schema.asPath)
+
+        ant.schemaExport(destdir: 'build') {
+            configuration(
+                configurationfile: 'src/main/resources/serverconf.hibernate.cfg.xml',
+                propertyFile: 'src/test/resources/hibernate-schema.properties'
+                )
+            hbm2ddl(
+                export: false,
+                outputfilename: 'schema-export.sql',
+                delimiter: ';',
+                format: 'true')
+            classpath {
+                pathelement(path: configurations.schema.asPath)
+                pathelement(path: 'src/main/resources')
+                pathelement(path: 'src/test/resources')
+                pathelement(path: 'build/classes/java/main')
+            }
+        }
+    }
+}
+
+task runServerConfCRUDTest (type: JavaExec) {
+    jvmArgs '-Dlogback.configurationFile=src/test/resources/logback-crudtest.xml'
+    mainClass = 'ee.ria.xroad.proxy.conf.ServerConfCRUDTest'
+    classpath = sourceSets.test.runtimeClasspath
+    standardInput = System.in;
+}
+
+schemaExport.dependsOn compileJava
+
+task licenseFormatJava(type:nl.javadude.gradle.plugins.license.License) {
+    source = fileTree('src/main/java')
+}
+
+task licenseTestJava(type:nl.javadude.gradle.plugins.license.License) {
+    source = fileTree('src/main/java')
+    check = true
+}
+
+licenseFormatMain.enabled = false
+licenseMain.enabled = false
+
+licenseFormat.dependsOn licenseFormatJava
+licenseTest.dependsOn licenseTestJava
+

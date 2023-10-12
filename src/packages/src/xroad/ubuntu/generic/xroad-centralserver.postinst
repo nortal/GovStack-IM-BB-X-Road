@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# disable confclient start
+if [ "$1" = "configure" ]; then
+  deb-systemd-invoke stop xroad-confclient
+  deb-systemd-invoke disable xroad-confclient
+fi
+
+if [ "$1" = abort-upgrade ]; then
+  exit 0
+fi
+
+#DEBHELPER#
+
+exit 0

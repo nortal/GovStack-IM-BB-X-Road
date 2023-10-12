@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+ext {
+  mainClassName = 'ee.ria.xroad.wsdlvalidator.WSDLValidator'
+}
+
+jar {
+  manifest {
+    attributes  'Main-Class': mainClassName
+  }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.apache.cxf:cxf-tools-validator:$cxfVersion"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+}
+
+shadowJar {
+    archiveClassifier = ''
+    exclude('**/module-info.class')
+    append 'META-INF/LICENSE'
+    append 'META-INF/LICENSE.txt'
+    append 'META-INF/NOTICE'
+    append 'META-INF/NOTICE.txt'
+    append 'META-INF/cxf/bus-extensions.txt'
+}
+
+build.dependsOn shadowJar

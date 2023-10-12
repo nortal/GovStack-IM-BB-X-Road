@@ -1,0 +1,8 @@
+dependencies {
+    implementation(project(':signer'))
+    implementation(project(':signer-protocol'))
+    implementation(project(':common-util'))
+
+    // Necessary since there are jars with no adequate Maven dependencies
+    implementation fileTree(dir: '../../libs', include: '*.jar')
+}

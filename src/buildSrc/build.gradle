@@ -1,0 +1,27 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    mavenCentral()
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'org.niis.xroad.oasvalidatorplugin'
+            implementationClass = 'org.niis.xroad.oasvalidatorplugin.Oas3ValidatorGradlePlugin'
+        }
+    }
+}
+
+dependencies {
+    // force newer version, older conflicts with owasp dependency check
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'org.openapi4j:openapi-parser:1.0.5'
+    implementation 'org.openapitools.openapistylevalidator:openapi-style-validator-lib:1.6'
+    implementation 'io.swagger.parser.v3:swagger-parser:2.0.28'
+    implementation 'org.openapitools.empoa:empoa-swagger-core:2.0.0'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+}

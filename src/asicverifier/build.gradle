@@ -1,0 +1,28 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+dependencies {
+    implementation  project(':common-verifier'),
+                    project(':asic-util')
+
+    implementation(project(':common-util')) {
+        exclude group: 'com.typesafe.akka'
+    }
+
+    testImplementation project(':common-test')
+}
+
+jar.enabled = false
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'ee.ria.xroad.asicverifier.AsicVerifierMain'
+    }
+    archiveClassifier = ''
+    archiveVersion = ''
+    exclude('**/module-info.class')
+}
+
+build.finalizedBy shadowJar
+
